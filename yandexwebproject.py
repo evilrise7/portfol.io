@@ -4,8 +4,9 @@ from flask import Flask, \
 
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
-from wtforms import Form, StringField, \
-    TextAreaField, PasswordField, validators
+from wtforms import Form, StringField,\
+    PasswordField, validators
+import json
 
 
 # Само приложение
@@ -34,6 +35,14 @@ class Registration(Form):
         validators.EqualTo('confirm', message='Пароли не совпадают!')
     ])
     confirm = PasswordField('Подтвердить пароль')
+
+
+# Информация о пользователе из json файла
+def get_data():
+    with open("static/users/accounts.json",
+              "rt", encoding="utf8") as f:
+        user_list = json.loads(f.read())
+    return user_list
 
 
 # Начальная страница
@@ -147,10 +156,11 @@ def account(username):
             if session['logged_in'] and session['username'] == username:
                 logged_user = True
 
+        # Информация о пользователе из json файла
+        user_data = get_data()
         return render_template('account.html',
                                user=username,
-                               avatar="default.png",
-                               country="Казахстан",
+                               user_data=user_data,
                                logged=logged_user)
     # Если Хьюстон у нас...
     else:

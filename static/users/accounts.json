@@ -1,0 +1,21 @@
+{
+  "evil_rise7": [
+    {
+        "avatar": "default.png",
+        "name": "Бахтияр",
+        "country": "Казахстан",
+        "description": "Программист, Мультипликатор.",
+        "photo_projects": [
+            {
+                "image": "level1.png",
+                "title": "Hostage",
+                "description": "Игра"
+            }
+        ],
+        "music_projects":[
+        ],
+        "contacts": "+77079789987",
+        "mail": "evil_rise7@portfol.io"
+    }
+  ]
+}

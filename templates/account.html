@@ -26,11 +26,11 @@
                             </nav>
                         </div>
                         <div class="inner">
-                            <img src="static/img/{{avatar}}" class="masthead-brand">
-                            <h1 class="masthead-brand">{{user}}</h1>
+                            <center><img src="static/img/{{user_data[user][0]['avatar']}}"></center>
+                            <center><h1>{{user_data[user][0]['name']}}</h1></center>
                         </div>
                         <div class="inner">
-                            <h3 class="masthead-brand">Страна: {{country}}</h3>
+                            <h3 class="masthead-brand">Страна: {{user_data[user][0]['country']}}</h3>
                         </div>
                     </div>
                 </div>
