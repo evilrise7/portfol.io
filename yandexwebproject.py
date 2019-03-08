@@ -19,6 +19,9 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 # База Данных
 mysql = MySQL(app)
 
+# Сообщение из-за PEP8 не поместилось
+m = "INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)"
+
 
 # Форма Регистрации
 class Registration(Form):
@@ -56,13 +59,13 @@ def register():
         # Инициализация курсора
         cursor = mysql.connection.cursor()
         # Занесение данных в Базу Данных
-        cursor.execute("INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)", (name, email, username, password))
+        cursor.execute(m, (name, email, username, password))
         # Занесение изменений в Базу Данных
         mysql.connection.commit()
 
         # Выход курсора
         cursor.close()
-        flash('Вы успешно зарегистрированы и теперь можете приступить к работе',
+        flash('Вы успешно зарегистрированы. Можете приступить к работе',
               'success')
 
         return redirect(url_for('login'))
@@ -82,9 +85,11 @@ def login():
         # Инициализация курсора
         cursor = mysql.connection.cursor()
         # Проверка пользователя в наличие в БД
-        result = cursor.execute("SELECT * FROM users WHERE username = %s", [port_name])
+        result = cursor.execute("SELECT * FROM users WHERE username = %s",
+                                [port_name])
 
-        if result > 0:
+        # Если проверка была произведена
+        if result:
             data = cursor.fetchone()
             password_crypt = data['password']
 
@@ -95,7 +100,7 @@ def login():
                 session['username'] = port_name
 
                 flash('Вы уже зашли в аккаунт.', 'success')
-                return redirect(url_for('dashboard'))
+                return redirect("/{}".format(session['username']))
             else:
                 # Были введены некорректные данные
                 error = 'Неверный логин'
@@ -110,6 +115,16 @@ def login():
     return render_template('login.html')
 
 
+# Сама профильная страница
+@app.route("/<username>")
+def account(username):
+
+    return render_template('account.html',
+                           user=username,
+                           avatar="default.png",
+                           country="Казахстан")
+
+
 # О проекте
 @app.route('/about')
 def about():
@@ -118,4 +133,4 @@ def about():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=5000, host='localhost')
+    app.run(port=1000, host='localhost')
