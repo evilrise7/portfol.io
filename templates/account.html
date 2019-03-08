@@ -9,6 +9,7 @@
         <title>{{user}}</title>
         <link href="static/page_index/bootstrap/css/bootstrap.css" rel="stylesheet">
         <link href="static/page_index/cover.css" rel="stylesheet">
+        <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
     </head>
     <body>
          <div class="site-wrapper">
@@ -16,8 +17,17 @@
                 <div class="cover-container">
                     <div class="masthead clearfix">
                         <div class="inner">
+                            <a href="/"><h3 class="masthead-brand">Portfol.io</h3></a>
+                            <nav class="nav nav-masthead">
+                                <a class="nav-link active" href="/{{user}}">О пользователе</a>
+                                {% if logged %}
+                                    <a class="nav-link" href="/logout">Выйти</a>
+                                {% endif %}
+                            </nav>
+                        </div>
+                        <div class="inner">
                             <img src="static/img/{{avatar}}" class="masthead-brand">
-                            <a href="/{{user}}"><h1 class="masthead-brand">{{user}}</h1></a>
+                            <h1 class="masthead-brand">{{user}}</h1>
                         </div>
                         <div class="inner">
                             <h3 class="masthead-brand">Страна: {{country}}</h3>

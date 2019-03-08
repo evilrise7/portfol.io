@@ -10,7 +10,7 @@ from wtforms import Form, StringField, \
 
 # Само приложение
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'yandexlyceum_POSHEL_V_ZHOPU'
+app.config['SECRET_KEY'] = 'IDIDNOT'
 app.config['MYSQL_HOST'] = 'sql9.freemysqlhosting.net'
 app.config['MYSQL_USER'] = 'sql9281617'
 app.config['MYSQL_PASSWORD'] = 'YG8tYECG5Z'
@@ -75,6 +75,10 @@ def register():
 # Вход пользователя
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    # Если пользователь уже вошел
+    if 'logged_in' in session:
+        return redirect("/{}".format(session['username']))
+    # Если пользователь новый
     if request.method == 'POST':
         # Получаю данные из текстовых форм
         # Пользователь
@@ -87,7 +91,6 @@ def login():
         # Проверка пользователя в наличие в БД
         result = cursor.execute("SELECT * FROM users WHERE username = %s",
                                 [port_name])
-
         # Если проверка была произведена
         if result:
             data = cursor.fetchone()
@@ -115,14 +118,43 @@ def login():
     return render_template('login.html')
 
 
+# Выход пользователя
+@app.route('/logout')
+def logout():
+    if session['logged_in']:
+        session.clear()  # Очистка данных входа
+        # Всплавающее сообщение
+        flash('Вы вышли из аккаунта', 'success')
+        return redirect(url_for('login'))
+
+
 # Сама профильная страница
 @app.route("/<username>")
 def account(username):
+    # Захват имени
+    # Инициализация курсора
+    cursor = mysql.connection.cursor()
+    # Проверка пользователя в наличие в БД
+    result = cursor.execute("SELECT * FROM users WHERE username = %s",
+                            [username])
+    # Флаг для проверки входа
+    logged_user = False
 
-    return render_template('account.html',
-                           user=username,
-                           avatar="default.png",
-                           country="Казахстан")
+    # Если ответ положительный
+    if result:
+        # Если пользователь вошел в свою страницу
+        if 'logged_in' in session:
+            if session['logged_in'] and session['username'] == username:
+                logged_user = True
+
+        return render_template('account.html',
+                               user=username,
+                               avatar="default.png",
+                               country="Казахстан",
+                               logged=logged_user)
+    # Если Хьюстон у нас...
+    else:
+        return render_template('404.html')
 
 
 # О проекте
@@ -133,4 +165,4 @@ def about():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=1000, host='localhost')
+    app.run(port=1001, host='localhost')
