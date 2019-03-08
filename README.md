@@ -16,7 +16,7 @@
 (Загрузка видео)
 (Загрузка текста)
 ```
-## Автор игры
+## Автор
 * **Nurmakhan Bakhtiyar** - *ULTRABAKHA* - [evil_rise7](https://github.com/evilrise7)
 ## Видео
 в процессе
