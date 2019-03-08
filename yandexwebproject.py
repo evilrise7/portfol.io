@@ -48,6 +48,7 @@ def get_data():
 # Начальная страница
 @app.route('/')
 def main_page():
+    # session.clear()
     return render_template('index.html')
 
 
@@ -71,6 +72,32 @@ def register():
         cursor.execute(m, (name, email, username, password))
         # Занесение изменений в Базу Данных
         mysql.connection.commit()
+
+        # Заносим в JSON аккаунт
+        try:
+            with open("static/users/accounts.json", encoding="utf8") as f:
+                # Загрузка JSON файла
+                accounts = json.load(f)
+        # Если файл пустой
+        except Exception:
+            accounts = {}
+
+        # Форма данных
+        data = {str(username): [{"avatar": "default.png",
+                                 "name": name,
+                                 "country": "Отсутствует",
+                                 "description": "Отсутствует",
+                                 "photo_projects": [],
+                                 "music_projects": [],
+                                 "video_projects": [],
+                                 "contacts": "Отсутствует",
+                                 "mail": email}]}
+        # Обновляем
+        accounts.update(data)
+        # Заносим информацию
+        with open("static/users/accounts.json",
+                  "w", encoding="utf8") as f:
+            json.dump(accounts, f, ensure_ascii=False)
 
         # Выход курсора
         cursor.close()
@@ -175,4 +202,4 @@ def about():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=1001, host='localhost')
+    app.run(port=1000, host='localhost')
