@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="Yandex Lyceum 2019">
         <meta name="author" content="evil_rise7">
-        <title>Регистрация</title>
+        <title>Register</title>
         <link href="static/page_index/bootstrap/css/bootstrap.css" rel="stylesheet">
         <link href="static/page_index/cover.css" rel="stylesheet">
         <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
@@ -17,11 +17,7 @@
                 <div class="cover-container">
                     <div class="masthead clearfix">
                         <div class="inner">
-                            <a href="/"><h3 class="masthead-brand">Portfol.io</h3></a>
-                            <nav class="nav nav-masthead">
-                                <a class="nav-link" href="/">Главная страница</a>
-                                <a class="nav-link" href="/about">О проекте</a>
-                            </nav>
+                            <a href="/"><h3 class="masthead-brand">:Portfol.io</h3></a>
                         </div>
                     </div>
                     <div class="inner cover">
@@ -39,7 +35,6 @@
                             <div class="alert alert-success">{{msg}}</div>
                         {% endif %}
                         {% macro render_field(field) %}
-                            {{ field.label }}
                             {{ field(**kwargs)|safe }}
                             {% if field.errors %}
                                 {% for error in field.errors %}
@@ -47,7 +42,7 @@
                                 {% endfor %}
                             {% endif %}
                         {% endmacro %}
-                        <h1 class="cover-heading">Регистрация</h1>
+                        <a href="/"><h1 class="cover-heading">Register</h1></a>
                         <form method="POST" action="">
                             <div class="form-group">
                                 {{render_field(form.name, class_="form-control")}}
@@ -65,13 +60,8 @@
                                 {{render_field(form.confirm, class_="form-control")}}
                             </div>
                             <p><input type="submit" class="btn btn-lg btn-secondary" 
-                                      value="Зарегистрироваться"></p>
+                                      value="Join Now"></p>
                         </form>
-                    </div>
-                    <div class="mastfoot">
-                        <div class="inner">
-                            <p><a href="https://github.com/evilrise7">@evil_rise7</a></p>
-                        </div>
                     </div>
                 </div>
             </div>

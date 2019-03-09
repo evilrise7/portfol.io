@@ -6,7 +6,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
         <meta name="description" content="Yandex Lyceum 2019">
         <meta name="author" content="evil_rise7">
-        <title>Войти</title>
+        <title>Login</title>
         <link href="static/page_index/bootstrap/css/bootstrap.css" rel="stylesheet">
         <link href="static/page_index/cover.css" rel="stylesheet">
         <link rel="shortcut icon" href="static/img/favicon.ico" type="image/x-icon">
@@ -17,11 +17,7 @@
                 <div class="cover-container">
                     <div class="masthead clearfix">
                         <div class="inner">
-                            <a href="/"><h3 class="masthead-brand">Portfol.io</h3></a>
-                            <nav class="nav nav-masthead">
-                                <a class="nav-link" href="/">Главная страница</a>
-                                <a class="nav-link" href="/about">О проекте</a>
-                            </nav>
+                            <a href="/"><h3 class="masthead-brand">:Portfol.io</h3></a>
                         </div>
                     </div>
                     <div class="inner cover">
@@ -38,25 +34,20 @@
                         {% if msg %}
                             <div class="alert alert-success">{{msg}}</div>
                         {% endif %}
-                        <h1 class="cover-heading">Вход</h1>
+                        <h1 class="cover-heading">Login</h1>
                         <form action="" method="POST">
                             <div class="form-group">
-                                <label>Имя Пользователя</label>
+                                <label>Portname</label>
                                 <input type="text" name="username" class="form-control" value={{request.form.username}}>
                             </div>
                             <div class="form-group">
-                                <label>Пароль</label>
+                                <label>Password</label>
                                 <input type="password" name="password" class="form-control" value={{request.form.password}}>
                             </div>
-                            <button type="submit" class="btn btn-lg btn-secondary">Войти</button>
+                            <button type="submit" class="btn btn-lg btn-secondary">Login</button>
                         </form>
-                        <p class="lead">Впервые у нас?</p>
-                        <p class="lead"><a href="/register" class="btn btn-lg btn-secondary">Пройти Регистрацию</a></p>
-                    </div>
-                    <div class="mastfoot">
-                        <div class="inner">
-                            <p><a href="https://github.com/evilrise7">@evil_rise7</a></p>
-                        </div>
+                        <p class="lead">Don’t have an account?</p>
+                        <p class="lead"><a href="/register" class="btn btn-lg btn-secondary">Sign Up</a></p>
                     </div>
                 </div>
             </div>

@@ -1,14 +1,17 @@
 from flask import Flask, \
     render_template, redirect, flash, \
-    request, url_for, session
+    request, url_for, session, send_from_directory
 
 from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
 from wtforms import Form, StringField,\
     PasswordField, validators
 import json
+import os
 
 
+# Приложение я старался сделать на англ,
+# Потому-что русский шрифт косячился в css
 # Само приложение
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'IDIDNOT'
@@ -27,14 +30,18 @@ m = "INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)"
 # Форма Регистрации
 class Registration(Form):
     # validators.Length = Длина соответсвующего текстового поля
-    name = StringField('Имя', [validators.Length(min=1, max=50)])
-    username = StringField('Портнейм', [validators.Length(min=4, max=25)])
-    email = StringField('ПортМэйл', [validators.Length(min=6, max=50)])
-    password = PasswordField('Пароль', [
+    name = StringField('Name', [validators.Length(min=1, max=50)],
+                       render_kw={"placeholder": "Name"})
+    username = StringField('Portname', [validators.Length(min=4, max=25)],
+                           render_kw={"placeholder": "Portname"})
+    email = StringField('Portmail', [validators.Length(min=6, max=50)],
+                        render_kw={"placeholder": "Portmail"})
+    password = PasswordField('Password', [
         validators.DataRequired(),
-        validators.EqualTo('confirm', message='Пароли не совпадают!')
-    ])
-    confirm = PasswordField('Подтвердить пароль')
+        validators.EqualTo('confirm', message='Does not match!')
+    ], render_kw={"placeholder": "Password"})
+    confirm = PasswordField('Confirm Password',
+                            render_kw={"placeholder": "Confirm Password"})
 
 
 # Информация о пользователе из json файла
@@ -43,6 +50,14 @@ def get_data():
               "rt", encoding="utf8") as f:
         user_list = json.loads(f.read())
     return user_list
+
+
+# Иконка
+@app.route('/favicon.ico')
+def favicon():
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                               'favicon.ico',
+                               mimetype='img/favicon.ico')
 
 
 # Начальная страница
@@ -85,13 +100,15 @@ def register():
         # Форма данных
         data = {str(username): [{"avatar": "default.png",
                                  "name": name,
-                                 "country": "Отсутствует",
-                                 "description": "Отсутствует",
-                                 "photo_projects": [],
-                                 "music_projects": [],
-                                 "video_projects": [],
-                                 "contacts": "Отсутствует",
-                                 "mail": email}]}
+                                 "country": "Does not exist",
+                                 "short_description": "Does not exist",
+                                 "description": "Does not exist",
+                                 "projects": [],
+                                 "contacts": "Does not exist",
+                                 "mail": email,
+                                 "social": [{"facebook": "",
+                                             "twitter": "",
+                                             "youtube": ""}]}]}
         # Обновляем
         accounts.update(data)
         # Заносим информацию
@@ -101,7 +118,7 @@ def register():
 
         # Выход курсора
         cursor.close()
-        flash('Вы успешно зарегистрированы. Можете приступить к работе',
+        flash('Congratulations! Now you can log in!',
               'success')
 
         return redirect(url_for('login'))
@@ -138,17 +155,17 @@ def login():
                 session['logged_in'] = True
                 session['username'] = port_name
 
-                flash('Вы уже зашли в аккаунт.', 'success')
+                flash('You are already logged in', 'success')
                 return redirect("/{}".format(session['username']))
             else:
                 # Были введены некорректные данные
-                error = 'Неверный логин'
+                error = 'Invalid login'
                 return render_template('login.html', error=error)
             # Выход курсора
             cursor.close()
         else:
             # Если в базе данных не было найдено пользователя
-            error = 'Портнейм не найден!'
+            error = 'Portname does not exist!'
             return render_template('login.html', error=error)
 
     return render_template('login.html')
@@ -160,7 +177,7 @@ def logout():
     if session['logged_in']:
         session.clear()  # Очистка данных входа
         # Всплавающее сообщение
-        flash('Вы вышли из аккаунта', 'success')
+        flash('You are logged out.', 'success')
         return redirect(url_for('login'))
 
 
@@ -175,6 +192,12 @@ def account(username):
                             [username])
     # Флаг для проверки входа
     logged_user = False
+    project_available = False
+    user_data = get_data()
+
+    # Проверка на содержание фото-проектов
+    if user_data[username][0]['projects']:
+        project_available = True
 
     # Если ответ положительный
     if result:
@@ -184,22 +207,23 @@ def account(username):
                 logged_user = True
 
         # Информация о пользователе из json файла
-        user_data = get_data()
         return render_template('account.html',
                                user=username,
                                user_data=user_data,
-                               logged=logged_user)
+                               logged=logged_user,
+                               project_flag=project_available)
+
     # Если Хьюстон у нас...
     else:
-        return render_template('404.html')
+        return redirect(url_for('404'))
 
 
-# О проекте
-@app.route('/about')
-def about():
-    return render_template('about.html')
+# Ошибка 404
+@app.route('/404')
+def error404():
+    return render_template('404.html')
 
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=1000, host='localhost')
+    app.run(port=1013, host='localhost')
