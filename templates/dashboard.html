@@ -62,10 +62,43 @@
 		<div class="row">
 			<div class="col-md-6">
 				<h2 class="heading wow animated fadeInUp">General</h2>
-				<p class="small wow animated fadeInUp">Edit avatar, port(-name, -mail), about sections.</p>
+				<p class="small wow animated fadeInUp">You can change the Avatar, Portname, Portmail, Password.</p>
                 <div class="form-group">
-                    <label for="photo">Choose a file</label>
-                    <input type="file" class="form-control-file" id="photo" name="file">
+                    <div class="col-md-6">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input name="name" type="name" class="form-control" placeholder="Portname">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input name="mail" type="mail" class="form-control" placeholder="Portmail">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <input name="pass" type="pass" class="form-control" placeholder="Password">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label for="photo">Choose an Avatar(*.png, *.jpg, *.jpeg)</label>
+                                <input type="file" class="form-control-file" id="photo" name="file">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h2 class="heading wow animated fadeInUp">Description</h2>
+                                <textarea name="description" type="descript" class="form-control" rows="3" placeholder="Type here"></textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h2 class="heading wow animated fadeInUp">About</h2>
+                                <textarea name="about" type="about" class="form-control" rows="10" placeholder="Type here"></textarea>
+                            </div>
+                        </div>
+					</div>
                 </div>
 			</div>
 		</div>

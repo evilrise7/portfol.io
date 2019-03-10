@@ -9,6 +9,7 @@ from wtforms import Form, StringField,\
 from werkzeug.utils import secure_filename
 import json
 import os
+from PIL import Image
 
 
 # Само приложение
@@ -16,13 +17,13 @@ app = Flask(__name__)
 
 # Папка загрузки аватарок
 UPLOAD_FOLDER = "static/img"
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+app.config['UPLOAD_FOLDER_AVA'] = UPLOAD_FOLDER
 # База данных конфиги
 app.config['SECRET_KEY'] = 'IDIDNOT'
-app.config['MYSQL_HOST'] = 'sql9.freemysqlhosting.net'
-app.config['MYSQL_USER'] = 'sql9281617'
-app.config['MYSQL_PASSWORD'] = 'YG8tYECG5Z'
-app.config['MYSQL_DB'] = 'sql9281617'
+app.config['MYSQL_HOST'] = 'remotemysql.com'
+app.config['MYSQL_USER'] = 'SG5Ztve51L'
+app.config['MYSQL_PASSWORD'] = '2KZ7XrdVVy'
+app.config['MYSQL_DB'] = 'SG5Ztve51L'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 # База Данных
 mysql = MySQL(app)
@@ -36,7 +37,7 @@ class Registration(Form):
     # validators.Length = Длина соответсвующего текстового поля
     name = StringField('Name', [validators.Length(min=1, max=50)],
                        render_kw={"placeholder": "Name"})
-    username = StringField('Portname', [validators.Length(min=4, max=25)],
+    username = StringField('Portname', [validators.Length(min=4, max=30)],
                            render_kw={"placeholder": "Portname"})
     email = StringField('Portmail', [validators.Length(min=6, max=50)],
                         render_kw={"placeholder": "Portmail"})
@@ -227,9 +228,31 @@ def dashboard(username):
         file = request.files['file']
         # Если файл был получен
         if file:
-            if (".png" or ".jpg" or ".jpeg") in file.filename:
+            if ".png" in file.filename or \
+                    ".jpg" in file.filename or\
+                    ".jpeg" in file.filename:
+                # Сохранение файла в папку
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+                file.save(os.path.join(
+                    app.config['UPLOAD_FOLDER_AVA'], filename))
+                # Изменение аватара под размеры
+                avatar = Image.open(os.path.join(
+                    app.config['UPLOAD_FOLDER_AVA'], filename))
+                avatar_size = (170, 170)
+                avatar.thumbnail(avatar_size, Image.ANTIALIAS)
+                # Сохранение измененной аватарки
+                if ".png" in file.filename:
+                    avatar.save(os.path.join(
+                        app.config['UPLOAD_FOLDER_AVA'], filename))
+                else:
+                    if ".jpeg" in file.filename:
+                        filename = filename.replace(".jpeg", "jpg")
+
+                    avatar.save(os.path.join(
+                        app.config['UPLOAD_FOLDER_AVA'], filename),
+                        "JPEG", quality=100, optimize=True,
+                        progressive=True)
+
         return "ok"
 
 
