@@ -26,3 +26,5 @@ JSON запись пользователей
 static папку следует скачать отсюда. GitHub не принимает больше 100 файлов.
 [10:00]
 https://yadi.sk/d/jkGx0IqOMhnFOw
+[12:03]
+https://yadi.sk/d/s3n4bUhn3ump7w
