@@ -193,14 +193,14 @@ def account(username):
     # Флаг для проверки входа
     logged_user = False
     project_available = False
-    user_data = get_data()
-
-    # Проверка на содержание фото-проектов
-    if user_data[username][0]['projects']:
-        project_available = True
 
     # Если ответ положительный
     if result:
+        user_data = get_data()
+        # Проверка на содержание фото-проектов
+        if user_data[username][0]['projects']:
+            project_available = True
+
         # Если пользователь вошел в свою страницу
         if 'logged_in' in session:
             if session['logged_in'] and session['username'] == username:
@@ -215,7 +215,7 @@ def account(username):
 
     # Если Хьюстон у нас...
     else:
-        return redirect(url_for('404'))
+        return redirect(url_for('error404'))
 
 
 # Ошибка 404
@@ -226,4 +226,4 @@ def error404():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=1013, host='localhost')
+    app.run(port=1015, host='localhost')
