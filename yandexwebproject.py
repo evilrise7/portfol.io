@@ -57,6 +57,20 @@ def get_data():
     return user_list
 
 
+# Изменение данных в json файле пользователей
+def json_write_data(username, info, tag):
+    with open("static/users/accounts.json",
+              "rt", encoding="utf8") as f:
+        user_info = json.loads(f.read())
+    user_info[username][0][tag] = info
+
+    with open("static/users/accounts.json",
+              "w", encoding="utf8") as f:
+        # Перейти в начало строки и отступы по 4 пробела
+        f.seek(0)
+        json.dump(user_info, f, indent=4, ensure_ascii=False)
+
+
 # Иконка
 @app.route('/favicon.ico')
 def favicon():
@@ -119,7 +133,9 @@ def register():
         # Заносим информацию
         with open("static/users/accounts.json",
                   "w", encoding="utf8") as f:
-            json.dump(accounts, f, ensure_ascii=False)
+            # Перейти в начало строки и отступы по 4 пробела
+            f.seek(0)
+            json.dump(accounts, f, indent=4, ensure_ascii=False)
 
         # Выход курсора
         cursor.close()
@@ -224,10 +240,10 @@ def dashboard(username):
 
     # Отправка формы
     if request.method == 'POST':
-        # Аватарка
-        file = request.files['file']
-        # Если файл был получен
-        if file:
+        # Если аватарка был залит на сервер
+        if 'file' in request.files:
+            # Аватарка
+            file = request.files['file']
             if ".png" in file.filename or \
                     ".jpg" in file.filename or\
                     ".jpeg" in file.filename:
@@ -253,6 +269,20 @@ def dashboard(username):
                         "JPEG", quality=100, optimize=True,
                         progressive=True)
 
+        # Если почта была изменена
+        if 'mail' in request.form:
+            mail = request.form['mail']
+            json_write_data(username, mail, 'mail')
+
+        # Если описание было изменено
+        if 'description' in request.form:
+            description = request.form['description']
+            json_write_data(username, description, 'short_description')
+
+        # Если описание о человеке было изменено
+        if 'about' in request.form:
+            about = request.form['about']
+            json_write_data(username, about, 'description')
         return "ok"
 
 
@@ -301,4 +331,4 @@ def error404():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=1017, host='localhost')
+    app.run(port=1019, host='localhost')

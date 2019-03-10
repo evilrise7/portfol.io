@@ -67,7 +67,7 @@
                     <div class="col-md-6">
                         <div class="row">
                             <div class="col-sm-12">
-                                <input name="name" type="name" class="form-control" placeholder="Portname">
+                                <input name="name" type="name" class="form-control" placeholder="Name">
                             </div>
                         </div>
                         <div class="row">
@@ -82,6 +82,7 @@
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
+                                <h2 class="heading wow animated fadeInUp">Avatar</h2>
                                 <label for="photo">Choose an Avatar(*.png, *.jpg, *.jpeg)</label>
                                 <input type="file" class="form-control-file" id="photo" name="file">
                             </div>
@@ -89,13 +90,13 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <h2 class="heading wow animated fadeInUp">Description</h2>
-                                <textarea name="description" type="descript" class="form-control" rows="3" placeholder="Type here"></textarea>
+                                <textarea name="description" type="descript" class="form-control" rows="3" placeholder="Type here">{{user_data[user][0]['short_description']}}</textarea>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
                                 <h2 class="heading wow animated fadeInUp">About</h2>
-                                <textarea name="about" type="about" class="form-control" rows="10" placeholder="Type here"></textarea>
+                                <textarea name="about" type="about" class="form-control" rows="10" placeholder="Type here">{{user_data[user][0]['description']}}</textarea>
                             </div>
                         </div>
 					</div>
