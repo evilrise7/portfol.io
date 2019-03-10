@@ -32,3 +32,5 @@ https://yadi.sk/d/s3n4bUhn3ump7w
 https://yadi.sk/d/8eqwHiLcVojnOA
 [17:00]
 https://yadi.sk/d/hWbBhke3cRt0tA
+[23:38] SQL
+https://yadi.sk/d/r5K4TdJTavfw8A
