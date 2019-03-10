@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Dashboard</title>
+    <meta name="description" content="Yandex Lyceum 2019">
+    <meta name="author" content="evil_rise7">
+	<link rel="stylesheet" type="text/css" href="../static/css/normalize.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/bootstrap.css">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" type="text/css" href="../static/css/owl.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/animate.css">
+	<link href="../static/font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<link rel="stylesheet" type="text/css" href="../static/css/et-icons.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/tooltip.css">
+	<link rel="stylesheet" type="text/css" href="../static/css/lightbox.css">
+	<link id="main" rel="stylesheet" type="text/css" href="../static/css/publisher.css">
+    <link rel="shortcut icon" href="../static/img/favicon.ico">
+</head>
+<body>
+<div id="wrapper" class="behind">
+<header>
+	<div class="container">
+			<div class="col-md-6 col-sm-12 wow animated fadeInUp">
+				<div class="intro-book">
+					<img src="../static/img/{{user_data[user][0]['avatar']}}" alt="">
+				</div>
+			</div>
+			<div class="col-md-6 intro-text hidden-sm hidden-xs wow animated fadeInUp">
+				<h2 class="heading">Portfol.io</h2>
+				<p>Welcome to Dashboard, {{user}}.</p>
+				<a href="#general" class="scrollto btn btn-white">Go ahead</a>
+			</div>
+	</div>
+</header>
+<form method="post" enctype="multipart/form-data">
+<nav class="navbar navbar-default">
+	<div class="container">
+		<div class="navbar-header">
+			<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+				<span class="sr-only">NavBar и всякая дичь</span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+				<span class="icon-bar"></span>
+			</button>
+			<a class="navbar-brand" href="#"><img src="../static/img/portfolio_logo_header.png" alt=""></a>
+		</div>
+
+		<!-- Collect the nav links, forms, and other content for toggling -->
+		<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+			<ul class="nav navbar-nav navbar-right main-nav">
+				<li><a href="#general" class="scrollto">General</a></li>
+				<li><a href="#portfolio" class="scrollto">Portfolio</a></li>
+                <li><a href="#" class="btn btn-green" onclick="document.forms[0].submit();return false;">Save</a></li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<section id="general">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-6">
+				<h2 class="heading wow animated fadeInUp">General</h2>
+				<p class="small wow animated fadeInUp">Edit avatar, port(-name, -mail), about sections.</p>
+                <div class="form-group">
+                    <label for="photo">Choose a file</label>
+                    <input type="file" class="form-control-file" id="photo" name="file">
+                </div>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="call-to-action">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 col-md-offset-2 text-center wow animated fadeInUp">
+				<p class="white">Be careful! Don't forget to <b>save</b> your changes.</p>
+			</div>
+		</div>
+	</div>
+</section>
+
+<section class="call-to-action">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 text-left text-center-mobile wow animated fadeInUp">
+				<h2 class="heading white top-fit">Save me!</h2>
+				<h4 class="subheading white no-margin">Press the button.</h4>
+			</div>
+			<div class="col-md-4 text-right wow animated fadeInUp text-center-mobile">
+				<a href="#" class="btn btn-white sample-button" onclick="document.forms[0].submit();return false;">Save</a>
+			</div>
+		</div>
+	</div>
+</section>
+</form>
+<footer>
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-6 text-left text-center-mobile">
+				<p class="copyright small muted">Template is from freetemplates.</p>
+			</div>
+		</div>
+	</div>
+</footer>
+</div>
+
+<div class="mobile-nav">
+	<ul class="menu">
+		
+	</ul>
+</div>
+
+
+
+<script src="../static/js/jquery-1.11.1.min.js"></script>
+<script src="../static/js/owl.carousel.js"></script>
+<script src="../static/js/lightbox.min.js"></script>
+<script src="../static/js/wow.min.js"></script>
+<script src="../static/js/jquery.onepagenav.js"></script>
+<script src="../static/js/core.js"></script>
+<script src="../static/js/tooltip.js"></script>
+<script src="../static/js/jquery.form-validator.js"></script>
+<script src="../static/js/preloader.js"></script>
+<script src="../static/js/main.js"></script>
+<script src="../static/js/bootstrap.min.js"></script>
+
+</body>
+</html>

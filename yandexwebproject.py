@@ -6,14 +6,18 @@ from flask_mysqldb import MySQL
 from passlib.hash import sha256_crypt
 from wtforms import Form, StringField,\
     PasswordField, validators
+from werkzeug.utils import secure_filename
 import json
 import os
 
 
-# Приложение я старался сделать на англ,
-# Потому-что русский шрифт косячился в css
 # Само приложение
 app = Flask(__name__)
+
+# Папка загрузки аватарок
+UPLOAD_FOLDER = "static/img"
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+# База данных конфиги
 app.config['SECRET_KEY'] = 'IDIDNOT'
 app.config['MYSQL_HOST'] = 'sql9.freemysqlhosting.net'
 app.config['MYSQL_USER'] = 'sql9281617'
@@ -181,6 +185,54 @@ def logout():
         return redirect(url_for('login'))
 
 
+# Панель управления неуказанного пользователя
+@app.route('/dashboard')
+def empty_board():
+    return redirect(url_for('error404'))
+
+
+# Панель управления
+@app.route('/dashboard/<username>', methods=['POST', 'GET'])
+def dashboard(username):
+    # Захват имени
+    # Инициализация курсора
+    cursor = mysql.connection.cursor()
+    # Проверка пользователя в наличие в БД
+    result = cursor.execute("SELECT * FROM users WHERE username = %s",
+                            [username])
+    if request.method == 'GET':
+        # Если пользователь найден в базе данных
+        if result:
+            # Если пользователь вошел в свою страницу
+            if 'logged_in' in session:
+                # Если пользователь вошел в свою панель управления
+                if session['logged_in'] and \
+                        session['username'] == username:
+                    return render_template('dashboard.html',
+                                           user=username,
+                                           user_data=get_data())
+
+                # Если пользователь заходит в чужую панель управления
+                else:
+                    return redirect("/{}".format(session['username']))
+
+            # Если пользователь не вошел в систему
+            else:
+                # Перенаправление на страницу входа
+                return redirect(url_for('login'))
+
+    # Отправка формы
+    if request.method == 'POST':
+        # Аватарка
+        file = request.files['file']
+        # Если файл был получен
+        if file:
+            if (".png" or ".jpg" or ".jpeg") in file.filename:
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        return "ok"
+
+
 # Сама профильная страница
 @app.route("/<username>")
 def account(username):
@@ -226,4 +278,4 @@ def error404():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=1015, host='localhost')
+    app.run(port=1017, host='localhost')

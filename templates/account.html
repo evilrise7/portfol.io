@@ -26,6 +26,11 @@
       </button>
       <div class="collapse navbar-collapse" id="navbarResponsive">
         <ul class="navbar-nav ml-auto">
+            {% if logged %}
+                <li class="nav-item mx-0 mx-lg-1">
+                    <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="/dashboard/{{user}}">Editor</a>
+                </li>
+            {% endif %}
           <li class="nav-item mx-0 mx-lg-1">
             <a class="nav-link py-3 px-0 px-lg-3 rounded js-scroll-trigger" href="#portfolio">Portfolio</a>
           </li>
@@ -148,12 +153,12 @@
     </a>
   </div>
   <!-- Portfolio Modals -->
+    {% if project_flag %}
+    {% for item in range(user_data[user][0]['projects']|length) %}
     <div class="portfolio-modal mfp-hide" id="portfolio-modal-{{item}}">
             <div class="portfolio-modal-dialog bg-white">
               <div class="container text-center">
                   <div class="row">
-                    {% if project_flag %}
-                        {% for item in range(user_data[user][0]['projects']|length) %}
                             <div class="col-lg-8 mx-auto">
                                 <h2 class="text-secondary text-uppercase mb-0">{{user_data[user][0]['projects'][item]['title']}}</h2>
                                 <img class="img-fluid mb-5" src="static/portfolio_thumbnails/{{user_data[user][0]['projects'][item]['image']}}" alt="{{user_data[user][0]['projects'][item]['title']}}">
@@ -180,12 +185,12 @@
                                     <i class="fa fa-close"></i>
                                  Close</a>
                             </div>
-                        {% endfor %}
-                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
+    {% endfor %}
+    {% endif %}
   <script src="static/vendor/jquery/jquery.min.js"></script>
   <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
   <script src="static/vendor/jquery-easing/jquery.easing.min.js"></script>
