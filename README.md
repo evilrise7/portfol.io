@@ -28,3 +28,5 @@ static папку следует скачать отсюда. GitHub не при
 https://yadi.sk/d/jkGx0IqOMhnFOw
 [12:03]
 https://yadi.sk/d/s3n4bUhn3ump7w
+[14:20]
+https://yadi.sk/d/8eqwHiLcVojnOA
