@@ -1,15 +1,17 @@
+import json
+import os
+from PIL import Image
+
 from flask import Flask, \
     render_template, redirect, flash, \
     request, url_for, session, send_from_directory
 
 from flask_mysqldb import MySQL
-from passlib.hash import sha256_crypt
 from wtforms import Form, StringField,\
     PasswordField, validators
 from werkzeug.utils import secure_filename
-import json
-import os
-from PIL import Image
+
+from passlib.hash import sha256_crypt
 
 
 # Само приложение
@@ -18,6 +20,11 @@ app = Flask(__name__)
 # Папка загрузки аватарок
 UPLOAD_FOLDER = "static/img"
 app.config['UPLOAD_FOLDER_AVA'] = UPLOAD_FOLDER
+
+# Папка загрузки музыки
+UPLOAD_FOLDER_MUSIC = "static/music"
+app.config['UPLOAD_FOLDER_MUSIC'] = UPLOAD_FOLDER_MUSIC
+
 # База данных конфиги
 app.config['SECRET_KEY'] = 'IDIDNOT'
 app.config['MYSQL_HOST'] = 'remotemysql.com'
@@ -30,6 +37,9 @@ mysql = MySQL(app)
 
 # Сообщение из-за PEP8 не поместилось
 m = "INSERT INTO users(name, email, username, password) VALUES(%s, %s, %s, %s)"
+um = "UPDATE users SET email = %s WHERE username = %s"
+un = "UPDATE users SET name = %s WHERE username = %s"
+up = "UPDATE users SET password = %s WHERE username = %s"
 
 
 # Форма Регистрации
@@ -211,12 +221,13 @@ def empty_board():
 # Панель управления
 @app.route('/dashboard/<username>', methods=['POST', 'GET'])
 def dashboard(username):
-    # Захват имени
     # Инициализация курсора
     cursor = mysql.connection.cursor()
     # Проверка пользователя в наличие в БД
     result = cursor.execute("SELECT * FROM users WHERE username = %s",
                             [username])
+
+    # Инициализация панели управления
     if request.method == 'GET':
         # Если пользователь найден в базе данных
         if result:
@@ -240,7 +251,10 @@ def dashboard(username):
 
     # Отправка формы
     if request.method == 'POST':
-        # Если аватарка был залит на сервер
+        # Инициализация пользователя
+        user_data = get_data()
+
+        # Если аватарка была залита на сервер
         if 'file' in request.files:
             # Аватарка
             file = request.files['file']
@@ -268,11 +282,34 @@ def dashboard(username):
                         app.config['UPLOAD_FOLDER_AVA'], filename),
                         "JPEG", quality=100, optimize=True,
                         progressive=True)
+                # Если аватарка была изменена на другую
+                if filename != user_data[username][0]["avatar"]:
+                    json_write_data(username, filename, 'avatar')
+
+        # Если имя было изменено
+        if 'name' in request.form:
+            name = request.form['name']
+            if name != "":
+                if name != user_data[username][0]['name'] \
+                        and 50 > len(name) > 1:
+                    cursor.execute(un, (name, username))
+                    json_write_data(username, name, 'name')
 
         # Если почта была изменена
         if 'mail' in request.form:
             mail = request.form['mail']
-            json_write_data(username, mail, 'mail')
+            if mail != "":
+                if mail != user_data[username][0]['mail'] \
+                        and 50 > len(mail) > 6:
+                    cursor.execute(um, (mail, username))
+                    json_write_data(username, mail, 'mail')
+
+        # Если пароль был изменен
+        if 'pass' in request.form:
+            passw = request.form['pass']
+            if passw != "":
+                passw = sha256_crypt.encrypt(str(passw))
+                cursor.execute(up, (passw, username))
 
         # Если описание было изменено
         if 'description' in request.form:
@@ -283,6 +320,17 @@ def dashboard(username):
         if 'about' in request.form:
             about = request.form['about']
             json_write_data(username, about, 'description')
+
+        # Если страна была изменена
+        if 'country' in request.form:
+            country = request.form['country']
+            if country != user_data[username][0]['country']:
+                json_write_data(username, country, 'country')
+
+        # Занесение изменений в базу данных
+        mysql.connection.commit()
+        # Выход курсора
+        cursor.close()
         return "ok"
 
 
