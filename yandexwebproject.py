@@ -59,26 +59,60 @@ class Registration(Form):
                             render_kw={"placeholder": "Confirm Password"})
 
 
-# Информация о пользователе из json файла
-def get_data():
-    with open("static/users/accounts.json",
-              "rt", encoding="utf8") as f:
-        user_list = json.loads(f.read())
-    return user_list
+# Изменение содержимого JSON файла
+class ChangeJSON:
+    # Инициализация
+    def __init__(self):
+        self.path = "static/users/accounts.json"
+
+    # Информация о пользователе из json файла
+    def get_data(self):
+        with open(self.path,
+                  "rt", encoding="utf8") as f:
+            user_list = json.loads(f.read())
+        return user_list
+
+    # Запись информации о пользователе в файл
+    def write_data(self, filelist):
+        with open(self.path,
+                  "w", encoding="utf8") as f:
+            # Перейти в начало строки
+            #  и отступы по 4 пробела
+            f.seek(0)
+            json.dump(filelist, f,
+                      indent=4, ensure_ascii=False)
+
+    # Изменение данных в json файле пользователей
+    def json_write_data(self, username, info, tag, w_id):
+        # Открываю файл для полного копирования
+        # содержимого
+        user_info = self.get_data()
+
+        if w_id == 1:
+            # Изменяю содержимое соц. сетей
+            user_info[username][0]['social'][0][tag] = info
+        else:
+            # Изменяю информацию
+            user_info[username][0][tag] = info
+
+        # Произвожу запись новых данных в файл
+        self.write_data(user_info)
 
 
-# Изменение данных в json файле пользователей
-def json_write_data(username, info, tag):
-    with open("static/users/accounts.json",
-              "rt", encoding="utf8") as f:
-        user_info = json.loads(f.read())
-    user_info[username][0][tag] = info
+# Сравнение и изменение данных соц. сетей
+class SocialMediaCheck:
+    # Инициализация класса
+    def __init__(self):
+        pass
 
-    with open("static/users/accounts.json",
-              "w", encoding="utf8") as f:
-        # Перейти в начало строки и отступы по 4 пробела
-        f.seek(0)
-        json.dump(user_info, f, indent=4, ensure_ascii=False)
+    def check_info(self, name, board, f_path, username):
+        social_media = request.form[str(name)]
+
+        # Если информация не похожа на то, что было в файле
+        if social_media != f_path and social_media != "":
+            board.json_write_data(username,
+                                  str(social_media),
+                                  str(name), 1)
 
 
 # Иконка
@@ -212,6 +246,32 @@ def logout():
         return redirect(url_for('login'))
 
 
+# Страница измененных настроек
+@app.route('/success/<username>')
+def success(username):
+    # Инициализация курсора
+    cursor = mysql.connection.cursor()
+    # Проверка пользователя в наличие в БД
+    result = cursor.execute("SELECT * FROM users WHERE username = %s",
+                            [username])
+    if result:
+        # Если пользователь вошел в свою страницу
+        if 'logged_in' in session:
+            # Если пользователь вошел в свою панель управления
+            if session['logged_in'] and \
+                    session['username'] == username:
+                return render_template('success.html', user=username)
+
+            # Если пользователь заходит в чужую панель управления
+            else:
+                return redirect("/{}".format(session['username']))
+
+        # Если пользователь не вошел в систему
+        else:
+            # Перенаправление на страницу входа
+            return redirect(url_for('login'))
+
+
 # Панель управления неуказанного пользователя
 @app.route('/dashboard')
 def empty_board():
@@ -227,6 +287,10 @@ def dashboard(username):
     result = cursor.execute("SELECT * FROM users WHERE username = %s",
                             [username])
 
+    # Создаю объекты классов содержимого JSON файла, соц. сетей
+    board = ChangeJSON()
+    media = SocialMediaCheck()
+
     # Инициализация панели управления
     if request.method == 'GET':
         # Если пользователь найден в базе данных
@@ -238,7 +302,7 @@ def dashboard(username):
                         session['username'] == username:
                     return render_template('dashboard.html',
                                            user=username,
-                                           user_data=get_data())
+                                           user_data=board.get_data())
 
                 # Если пользователь заходит в чужую панель управления
                 else:
@@ -252,7 +316,7 @@ def dashboard(username):
     # Отправка формы
     if request.method == 'POST':
         # Инициализация пользователя
-        user_data = get_data()
+        user_data = board.get_data()
 
         # Если аватарка была залита на сервер
         if 'file' in request.files:
@@ -282,9 +346,11 @@ def dashboard(username):
                         app.config['UPLOAD_FOLDER_AVA'], filename),
                         "JPEG", quality=100, optimize=True,
                         progressive=True)
+
                 # Если аватарка была изменена на другую
                 if filename != user_data[username][0]["avatar"]:
-                    json_write_data(username, filename, 'avatar')
+                    board.json_write_data(username, filename,
+                                          'avatar', 0)
 
         # Если имя было изменено
         if 'name' in request.form:
@@ -293,7 +359,8 @@ def dashboard(username):
                 if name != user_data[username][0]['name'] \
                         and 50 > len(name) > 1:
                     cursor.execute(un, (name, username))
-                    json_write_data(username, name, 'name')
+                    board.json_write_data(username, name,
+                                          'name', 0)
 
         # Если почта была изменена
         if 'mail' in request.form:
@@ -302,7 +369,8 @@ def dashboard(username):
                 if mail != user_data[username][0]['mail'] \
                         and 50 > len(mail) > 6:
                     cursor.execute(um, (mail, username))
-                    json_write_data(username, mail, 'mail')
+                    board.json_write_data(username, mail,
+                                          'mail', 0)
 
         # Если пароль был изменен
         if 'pass' in request.form:
@@ -312,26 +380,39 @@ def dashboard(username):
                 cursor.execute(up, (passw, username))
 
         # Если описание было изменено
-        if 'description' in request.form:
-            description = request.form['description']
-            json_write_data(username, description, 'short_description')
+        if 'short_description' in request.form:
+            description = request.form['short_description']
+            board.json_write_data(username, description,
+                                  'short_description', 0)
 
         # Если описание о человеке было изменено
-        if 'about' in request.form:
-            about = request.form['about']
-            json_write_data(username, about, 'description')
+        if 'description' in request.form:
+            about = request.form['description']
+            board.json_write_data(username, about,
+                                  'description', 0)
 
         # Если страна была изменена
         if 'country' in request.form:
             country = request.form['country']
             if country != user_data[username][0]['country']:
-                json_write_data(username, country, 'country')
+                board.json_write_data(username, country,
+                                      'country', 0)
+
+        # Если социальные сети были изменены(sm - soc.media)
+        for sm in ["facebook", "twitter", "youtube"]:
+            if sm in request.form:
+                f_path = user_data[username][0]['social'][0][str(sm)]
+                media.check_info(str(sm), board,
+                                 f_path, username)
 
         # Занесение изменений в базу данных
         mysql.connection.commit()
         # Выход курсора
         cursor.close()
-        return "ok"
+
+        # Перенаправление на страницу измененных настроек
+        return render_template('success.html',
+                               user=username)
 
 
 # Сама профильная страница
@@ -343,13 +424,19 @@ def account(username):
     # Проверка пользователя в наличие в БД
     result = cursor.execute("SELECT * FROM users WHERE username = %s",
                             [username])
+
+    # Объект класса для изменения содержимого JSON
+    account_data = ChangeJSON()
+
     # Флаг для проверки входа
     logged_user = False
     project_available = False
 
     # Если ответ положительный
     if result:
-        user_data = get_data()
+        # Копирование всех данных из JSON файла
+        user_data = account_data.get_data()
+
         # Проверка на содержание фото-проектов
         if user_data[username][0]['projects']:
             project_available = True

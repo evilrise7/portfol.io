@@ -61,12 +61,12 @@
 
 <section id="general">
 	<div class="container">
-		<div class="row">
-			<div class="col-md-6">
+		<center><div class="row">
+			<div class="col-m-6">
 				<h2 class="heading wow animated fadeInUp">General</h2>
 				<p class="small wow animated fadeInUp">You can change the Avatar, Portname, Portmail, Password.</p>
                 <div class="form-group">
-                    <div class="col-md-6">
+                    <div class="col-m-6">
                         <div class="row">
                             <div class="col-sm-12">
                                 <input name="name" type="name" class="form-control" placeholder="Name">
@@ -94,6 +94,7 @@
                             <h2 class="heading wow animated fadeInUp">Country</h2>
 				            <p class="small wow animated fadeInUp">Your country was {{user_data[user][0]['country']}}</p>
                              <select id="country" name="country" class="form-control">
+                                <option value="{{user_data[user][0]['country']}}">{{user_data[user][0]['country']}}</option>
                                 <option value="Afghanistan">Afghanistan</option>
                                 <option value="Åland Islands">Åland Islands</option>
                                 <option value="Albania">Albania</option>
@@ -344,19 +345,40 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <h2 class="heading wow animated fadeInUp">Description</h2>
-                                <textarea name="description" type="descript" class="form-control" rows="3" placeholder="Type here">{{user_data[user][0]['short_description']}}</textarea>
+                                <textarea name="short_description" type="short_description" class="form-control" rows="3" placeholder="Type here">{{user_data[user][0]['short_description']}}</textarea>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-sm-12">
                                 <h2 class="heading wow animated fadeInUp">About</h2>
-                                <textarea name="about" type="about" class="form-control" rows="10" placeholder="Type here">{{user_data[user][0]['description']}}</textarea>
+                                <textarea name="description" type="description" class="form-control" rows="10" placeholder="Type here">{{user_data[user][0]['description']}}</textarea>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h2 class="heading wow animated fadeInUp">Facebook</h2>
+                                <p class="small wow animated fadeInUp">Put your page id</p>
+                                <input name="facebook" type="facebook" class="form-control" placeholder="Facebook">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h2 class="heading wow animated fadeInUp">Twitter</h2>
+                                <p class="small wow animated fadeInUp">Put your page id</p>
+                                <input name="twitter" type="twitter" class="form-control" placeholder="Twitter">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <h2 class="heading wow animated fadeInUp">Youtube</h2>
+                                <p class="small wow animated fadeInUp">Put your channel id/url</p>
+                                <input name="youtube" type="youtube" class="form-control" placeholder="Youtube">
                             </div>
                         </div>
 					</div>
                 </div>
 			</div>
-		</div>
+		</div></center>
 	</div>
 </section>
 
