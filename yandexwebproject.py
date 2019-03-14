@@ -21,6 +21,10 @@ app = Flask(__name__)
 UPLOAD_FOLDER = "static/img"
 app.config['UPLOAD_FOLDER_AVA'] = UPLOAD_FOLDER
 
+# Папка загрузки аватарок
+UPLOAD_FOLDER_PORTFOLIO = "static/portfolio_thumbnails"
+app.config['UPLOAD_FOLDER_PORTFOLIO'] = UPLOAD_FOLDER_PORTFOLIO
+
 # Папка загрузки музыки
 UPLOAD_FOLDER_MUSIC = "static/music"
 app.config['UPLOAD_FOLDER_MUSIC'] = UPLOAD_FOLDER_MUSIC
@@ -91,6 +95,19 @@ class ChangeJSON:
         if w_id == 1:
             # Изменяю содержимое соц. сетей
             user_info[username][0]['social'][0][tag] = info
+
+        elif w_id == 2:
+            # Образ словаря
+            dict_obj = {str(tag): str(info)}
+
+            # Добавление образа, как новый проект в лист словарей
+            user_info[username][0]['projects'].append(dict_obj.copy())
+
+        elif w_id == 3:
+            # Если данные были занесены до этого, то забиваем все
+            # в текущий словарь из листа словарей
+            user_info[username][0]['projects'][-1][str(tag)] = str(info)
+
         else:
             # Изменяю информацию
             user_info[username][0][tag] = info
@@ -113,6 +130,72 @@ class SocialMediaCheck:
             board.json_write_data(username,
                                   str(social_media),
                                   str(name), 1)
+
+
+# Портфолио и его изменение
+class Portfolio:
+    def __init__(self):
+        pass
+
+    def add_item(self, username, board):
+        form_status = False
+        title = ""
+        content = ""
+        filename = ""
+
+        if 'thumbnail' in request.files:
+            # Начнем с ИКОНКИ проекта
+            thumbnail = request.files['thumbnail']
+            # Сохранение файла в папку
+            filename = secure_filename(thumbnail.filename)
+            thumbnail.save(os.path.join(
+                app.config['UPLOAD_FOLDER_PORTFOLIO'], filename))
+            # Изменение аватара под размеры
+            thumb_img = Image.open(os.path.join(
+                app.config['UPLOAD_FOLDER_PORTFOLIO'], filename))
+            thumb_size = (450, 325)
+            thumb_img.thumbnail(thumb_size, Image.ANTIALIAS)
+            # Сохранение измененной иконки
+            if ".png" in thumbnail.filename:
+                thumb_img.save(os.path.join(
+                    app.config['UPLOAD_FOLDER_PORTFOLIO'], filename))
+            else:
+                if ".jpeg" in thumbnail.filename:
+                    filename = filename.replace(".jpeg", "jpg")
+
+                thumb_img.save(os.path.join(
+                    app.config['UPLOAD_FOLDER_PORTFOLIO'], filename),
+                    "JPEG", quality=100, optimize=True,
+                    progressive=True)
+
+        # Название проекта
+        if 'title' in request.form:
+            title = request.form['title']
+            # Проверка на содержание.
+            if title == "":
+                form_status = False
+
+        # Описание проекта
+        if 'content' in request.form:
+            content = request.form['content']
+
+            # Проверка на содержание.
+            if content == "":
+                form_status = False
+
+        # Занесение данных в JSON файл
+        if title and content and filename:
+            form_status = True
+        else:
+            form_status = False
+
+        if form_status:
+            board.json_write_data(username, filename, 'image', 2)
+            board.json_write_data(username, title, 'title', 3)
+            board.json_write_data(username, content, 'content', 3)
+
+    def remove_item(self, project):
+        pass
 
 
 # Иконка
@@ -156,6 +239,7 @@ def register():
             with open("static/users/accounts.json", encoding="utf8") as f:
                 # Загрузка JSON файла
                 accounts = json.load(f)
+
         # Если файл пустой
         except Exception:
             accounts = {}
@@ -163,11 +247,11 @@ def register():
         # Форма данных
         data = {str(username): [{"avatar": "default.png",
                                  "name": name,
-                                 "country": "Does not exist",
-                                 "short_description": "Does not exist",
-                                 "description": "Does not exist",
+                                 "country": "-",
+                                 "short_description": "-",
+                                 "description": "-",
                                  "projects": [],
-                                 "contacts": "Does not exist",
+                                 "contacts": "-",
                                  "mail": email,
                                  "social": [{"facebook": "",
                                              "twitter": "",
@@ -287,9 +371,11 @@ def dashboard(username):
     result = cursor.execute("SELECT * FROM users WHERE username = %s",
                             [username])
 
-    # Создаю объекты классов содержимого JSON файла, соц. сетей
+    # Создаю объекты классов содержимого JSON файла,
+    # соц. сетей, портфолио
     board = ChangeJSON()
     media = SocialMediaCheck()
+    portfolio = Portfolio()
 
     # Инициализация панели управления
     if request.method == 'GET':
@@ -405,6 +491,9 @@ def dashboard(username):
                 media.check_info(str(sm), board,
                                  f_path, username)
 
+        # Портфолио
+        portfolio.add_item(username, board)
+
         # Занесение изменений в базу данных
         mysql.connection.commit()
         # Выход курсора
@@ -466,4 +555,4 @@ def error404():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=1019, host='localhost')
+    app.run(port=1020, host='localhost')
