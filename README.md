@@ -24,7 +24,7 @@ JSON запись пользователей
 ## Справка
 * STATIC папка в архиве
 * Последняя сборка:
-* https://yadi.sk/d/ePMWG9FKGXtwug
+* https://yadi.sk/d/KagB2XbqIFtreQ
 ## Дневник обновлений
 [10.03.2019]
 static папку следует скачать отсюда. GitHub не принимает больше 100 файлов.
@@ -41,3 +41,5 @@ https://yadi.sk/d/r5K4TdJTavfw8A
 [11.03.2019]
 [23:47]
 https://yadi.sk/d/0_jIArSpfvdEIQ
+[20:00]
+https://yadi.sk/d/ePMWG9FKGXtwug
