@@ -108,6 +108,22 @@ class ChangeJSON:
             # в текущий словарь из листа словарей
             user_info[username][0]['projects'][-1][str(tag)] = str(info)
 
+        elif w_id == 4:
+            # Копирую лист из JSON и добавляю туда ссылки, затем сохраняю
+            video_json = user_info[username][0]['projects'][-1].get('video')
+            video_json.append(tag)
+            user_info[username][0]['projects'][-1]['video'] = video_json
+
+        elif w_id == 5:
+            # Создаю лист видео или музыки
+            user_info[username][0]['projects'][-1][str(tag)] = []
+
+        elif w_id == 6:
+            # Копирую лист из JSON и добавляю туда файлы, затем сохраняю
+            music_json = user_info[username][0]['projects'][-1].get('music')
+            music_json.append(tag)
+            user_info[username][0]['projects'][-1]['music'] = music_json
+
         else:
             # Изменяю информацию
             user_info[username][0][tag] = info
@@ -139,10 +155,14 @@ class Portfolio:
 
     def add_item(self, username, board):
         form_status = False
+
         title = ""
         content = ""
         filename = ""
+        video_list = []
+        music_list = []
 
+        # Иконка проекта
         if 'thumbnail' in request.files:
             # Начнем с ИКОНКИ проекта
             thumbnail = request.files['thumbnail']
@@ -183,16 +203,63 @@ class Portfolio:
             if content == "":
                 form_status = False
 
-        # Занесение данных в JSON файл
+        # Youtube URL'S
+        for i in range(1, 4):
+            # Имя формы
+            video_input = "video" + str(i)
+            # Если пользователь залил ссылки на видео
+            if video_input in request.form:
+                # Захват видео
+                video_url = request.form[video_input]
+
+                # Если ссылка действительна, т.е. не пустая
+                if video_url:
+                    # Добавляю в список ссылку
+                    video_list.append(str(video_url))
+
+        # Музыка
+        for i in range(1, 6):
+            # Имя формы
+            music_input = "music" + str(i)
+            # Если пользователь закинул файл с песнями
+            if music_input in request.files:
+                # Начнем с ИКОНКИ проекта
+                music_file = request.files[music_input]
+
+                # Сохранение музыки
+                if ".mp3" in music_file.filename:
+                    # Сохранение файла в папку
+                    music_name = secure_filename(music_file.filename)
+                    music_file.save(os.path.join(
+                        app.config['UPLOAD_FOLDER_MUSIC'], music_name))
+                    # Заношу в список название песни
+                    music_list.append(str(music_name))
+
+        # Занесение данных в JSON файл и проверка на подлинность
         if title and content and filename:
             form_status = True
         else:
             form_status = False
 
+        # Если все формы были заполнены корректно
         if form_status:
+            # Заносятся в JSON файл шаблон проекта
             board.json_write_data(username, filename, 'image', 2)
             board.json_write_data(username, title, 'title', 3)
             board.json_write_data(username, content, 'content', 3)
+            board.json_write_data(username, [], 'video', 5)
+            board.json_write_data(username, [], 'music', 5)
+
+            # Если присутствуют видео, то они добавляются под спец.ключом
+            if video_list:
+                for i in range(len(video_list)):
+                    board.json_write_data(username, '',
+                                          str(video_list[i]), 4)
+
+            # Если присутствуют песни, то они добавляются под спец.ключом
+            if music_list:
+                for i in range(len(music_list)):
+                    board.json_write_data(username, '', music_list[i][:-4], 6)
 
     def remove_item(self, project):
         pass
