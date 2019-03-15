@@ -7,15 +7,15 @@
 Страница регистрации
 Страница входа
 Регистрация и Вход
+Страница Ошибки
 JSON запись пользователей
 Портфолио Страница
+Редактирование Страницы и проектов
 ```
 ## Предстоит реализовать
 ```
-Изменение данных
-(Загрузка изображений)
-(Загрузка видео)
-(Загрузка текста)
+API тесты
+Удаление сущностей системы
 ```
 ## Автор
 * **Nurmakhan Bakhtiyar** - *ULTRABAKHA* - [evil_rise7](https://github.com/evilrise7)
@@ -24,7 +24,7 @@ JSON запись пользователей
 ## Справка
 * STATIC папка в архиве
 * Последняя сборка:
-* https://yadi.sk/d/KagB2XbqIFtreQ
+* https://yadi.sk/d/AJallXcbiNc1TQ
 ## Дневник обновлений
 [10.03.2019]
 static папку следует скачать отсюда. GitHub не принимает больше 100 файлов.
@@ -43,3 +43,5 @@ https://yadi.sk/d/r5K4TdJTavfw8A
 https://yadi.sk/d/0_jIArSpfvdEIQ
 [20:00]
 https://yadi.sk/d/ePMWG9FKGXtwug
+[17:38]
+https://yadi.sk/d/KagB2XbqIFtreQ
