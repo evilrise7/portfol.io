@@ -4,9 +4,13 @@ from PIL import Image
 
 from flask import Flask, \
     render_template, redirect, flash, \
-    request, url_for, session, send_from_directory
+    request, url_for, session, send_from_directory,\
+    jsonify
 
 from flask_mysqldb import MySQL
+
+from flask_restful import Api, Resource
+
 from wtforms import Form, StringField,\
     PasswordField, validators
 from werkzeug.utils import secure_filename
@@ -16,6 +20,7 @@ from passlib.hash import sha256_crypt
 
 # Само приложение
 app = Flask(__name__)
+api = Api(app)
 
 # Папка загрузки аватарок
 UPLOAD_FOLDER = "static/img"
@@ -265,6 +270,75 @@ class Portfolio:
         pass
 
 
+# API Портфолио
+class PortfolioList(Resource):
+    # Вернуть целый список проектов
+    def get_list(self):
+        json_class = ChangeJSON()
+        user_projects = json_class.get_data()
+        return user_projects
+
+
+# Инициализация JSON класса для портфолио
+portfolio_class = PortfolioList()
+
+
+# Функция для проверки пользователя внутри БД
+def check_username(username):
+    # Захват имени
+    # Инициализация курсора
+    cursor = mysql.connection.cursor()
+    # Проверка пользователя в наличие в БД
+    result = cursor.execute("SELECT * FROM users WHERE username = %s",
+                            [username])
+    # Возвращаю ответ
+    return [cursor, result]
+
+
+# Вернуть все проекты
+@app.route('/portfolio/<string:username>',  methods=['GET'])
+def get_projects(username):
+    # Если пользователь внутри БД
+    if check_username(username)[1]:
+        # Беру значения из JSON
+        user_json = portfolio_class.get_list()
+
+        # Возвращение ответа в виде JSON
+        return jsonify(
+            {str(username): user_json[username][0]['projects']})
+
+    # Если пользователя нет внутри БД
+    else:
+        return jsonify({'USER': 'DOES NOT EXIST!'})
+
+
+# Вернуть все проекты
+@app.route('/portfolio/<string:username>/<int:project_id>',  methods=['GET'])
+def get_project_id(username, project_id):
+    # Если пользователь внутри БД
+    if check_username(username)[1]:
+        # Беру значения из JSON
+        user_json = portfolio_class.get_list()
+
+        # Если проект находится в JSON
+        if project_id < len(user_json[username][0]['projects']):
+            # Заголовок JSON
+            output_name = str(username) + "'s project: " + str(project_id)
+
+            # Возвращение ответа в виде JSON
+            return jsonify(
+                {output_name: user_json[username][0]['projects'][project_id]})
+
+        # Если данного проекта не существует
+        else:
+            return jsonify(
+                {("PROJECT " + str(project_id)): 'DOES NOT EXIST!'})
+
+    # Если пользователя нет внутри БД
+    else:
+        return jsonify({'USER': 'DOES NOT EXIST!'})
+
+
 # Иконка
 @app.route('/favicon.ico')
 def favicon():
@@ -355,14 +429,10 @@ def login():
         # Пароль
         port_pass = request.form['password']
 
-        # Инициализация курсора
-        cursor = mysql.connection.cursor()
-        # Проверка пользователя в наличие в БД
-        result = cursor.execute("SELECT * FROM users WHERE username = %s",
-                                [port_name])
+        list_db = check_username(port_name)
         # Если проверка была произведена
-        if result:
-            data = cursor.fetchone()
+        if list_db[1]:
+            data = list_db[0].fetchone()
             password_crypt = data['password']
 
             # Сравнение паролей(зашифрованного и обычного)
@@ -377,8 +447,6 @@ def login():
                 # Были введены некорректные данные
                 error = 'Invalid login'
                 return render_template('login.html', error=error)
-            # Выход курсора
-            cursor.close()
         else:
             # Если в базе данных не было найдено пользователя
             error = 'Portname does not exist!'
@@ -400,12 +468,7 @@ def logout():
 # Страница измененных настроек
 @app.route('/success/<username>')
 def success(username):
-    # Инициализация курсора
-    cursor = mysql.connection.cursor()
-    # Проверка пользователя в наличие в БД
-    result = cursor.execute("SELECT * FROM users WHERE username = %s",
-                            [username])
-    if result:
+    if check_username(username)[1]:
         # Если пользователь вошел в свою страницу
         if 'logged_in' in session:
             # Если пользователь вошел в свою панель управления
@@ -432,22 +495,18 @@ def empty_board():
 # Панель управления
 @app.route('/dashboard/<username>', methods=['POST', 'GET'])
 def dashboard(username):
-    # Инициализация курсора
-    cursor = mysql.connection.cursor()
-    # Проверка пользователя в наличие в БД
-    result = cursor.execute("SELECT * FROM users WHERE username = %s",
-                            [username])
-
     # Создаю объекты классов содержимого JSON файла,
     # соц. сетей, портфолио
     board = ChangeJSON()
     media = SocialMediaCheck()
     portfolio = Portfolio()
 
+    list_db = check_username(username)
+
     # Инициализация панели управления
     if request.method == 'GET':
         # Если пользователь найден в базе данных
-        if result:
+        if list_db[1]:
             # Если пользователь вошел в свою страницу
             if 'logged_in' in session:
                 # Если пользователь вошел в свою панель управления
@@ -511,7 +570,9 @@ def dashboard(username):
             if name != "":
                 if name != user_data[username][0]['name'] \
                         and 50 > len(name) > 1:
-                    cursor.execute(un, (name, username))
+                    list_db[0].execute(un, (name, username))
+                    # Занесение изменений в Базу Данных
+                    mysql.connection.commit()
                     board.json_write_data(username, name,
                                           'name', 0)
 
@@ -521,7 +582,9 @@ def dashboard(username):
             if mail != "":
                 if mail != user_data[username][0]['mail'] \
                         and 50 > len(mail) > 6:
-                    cursor.execute(um, (mail, username))
+                    list_db[0].execute(um, (mail, username))
+                    # Занесение изменений в Базу Данных
+                    mysql.connection.commit()
                     board.json_write_data(username, mail,
                                           'mail', 0)
 
@@ -529,8 +592,11 @@ def dashboard(username):
         if 'pass' in request.form:
             passw = request.form['pass']
             if passw != "":
+                # Зашифрока пароля
                 passw = sha256_crypt.encrypt(str(passw))
-                cursor.execute(up, (passw, username))
+                list_db[0].execute(up, (passw, username))
+                # Занесение изменений в Базу Данных
+                mysql.connection.commit()
 
         # Если описание было изменено
         if 'short_description' in request.form:
@@ -564,7 +630,7 @@ def dashboard(username):
         # Занесение изменений в базу данных
         mysql.connection.commit()
         # Выход курсора
-        cursor.close()
+        list_db[0].close()
 
         # Перенаправление на страницу измененных настроек
         return render_template('success.html',
@@ -574,13 +640,6 @@ def dashboard(username):
 # Сама профильная страница
 @app.route("/<username>")
 def account(username):
-    # Захват имени
-    # Инициализация курсора
-    cursor = mysql.connection.cursor()
-    # Проверка пользователя в наличие в БД
-    result = cursor.execute("SELECT * FROM users WHERE username = %s",
-                            [username])
-
     # Объект класса для изменения содержимого JSON
     account_data = ChangeJSON()
 
@@ -589,7 +648,7 @@ def account(username):
     project_available = False
 
     # Если ответ положительный
-    if result:
+    if check_username(username)[1]:
         # Копирование всех данных из JSON файла
         user_data = account_data.get_data()
 
@@ -622,4 +681,4 @@ def error404():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=1020, host='localhost')
+    app.run(port=8080, host='localhost')
