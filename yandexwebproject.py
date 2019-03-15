@@ -9,7 +9,7 @@ from flask import Flask, \
 
 from flask_mysqldb import MySQL
 
-from flask_restful import Api, Resource
+from flask_restful import Api, Resource, reqparse
 
 from wtforms import Form, StringField,\
     PasswordField, validators
@@ -21,6 +21,14 @@ from passlib.hash import sha256_crypt
 # Само приложение
 app = Flask(__name__)
 api = Api(app)
+
+# Парсер для тестов
+parser = reqparse.RequestParser()
+
+# Аргументы
+parser.add_argument('image', required=True)
+parser.add_argument('title', required=True)
+parser.add_argument('content', required=True)
 
 # Папка загрузки аватарок
 UPLOAD_FOLDER = "static/img"
