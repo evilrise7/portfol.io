@@ -11,10 +11,8 @@
 JSON запись пользователей
 Портфолио Страница
 Редактирование Страницы и проектов
+API
 API тесты
-```
-## Предстоит реализовать
-```
 Удаление сущностей системы
 ```
 ## Автор
@@ -24,10 +22,8 @@ API тесты
 ## Справка
 * STATIC папка в архиве
 * Последняя сборка:
-* https://yadi.sk/d/AJallXcbiNc1TQ
+* https://yadi.sk/d/Ga2eQ2BgldPESA
 ## Дневник обновлений
-[10.03.2019]
-static папку следует скачать отсюда. GitHub не принимает больше 100 файлов.
 [10:00]
 https://yadi.sk/d/jkGx0IqOMhnFOw
 [12:03]
@@ -45,3 +41,5 @@ https://yadi.sk/d/0_jIArSpfvdEIQ
 https://yadi.sk/d/ePMWG9FKGXtwug
 [17:38]
 https://yadi.sk/d/KagB2XbqIFtreQ
+[Позавчера]
+https://yadi.sk/d/AJallXcbiNc1TQ
