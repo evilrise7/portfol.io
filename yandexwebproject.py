@@ -1,20 +1,16 @@
+# Библиотеки
 import json
 import os
 from PIL import Image
-
 from flask import Flask, \
     render_template, redirect, flash, \
     request, url_for, session, send_from_directory,\
     jsonify
-
 from flask_mysqldb import MySQL
-
 from flask_restful import Api, Resource, reqparse
-
 from wtforms import Form, StringField,\
     PasswordField, validators
 from werkzeug.utils import secure_filename
-
 from passlib.hash import sha256_crypt
 
 
@@ -137,6 +133,13 @@ class ChangeJSON:
             music_json.append(tag)
             user_info[username][0]['projects'][-1]['music'] = music_json
 
+        elif w_id == 7:
+            # Удаление проекта
+            # Проверка есть ли в листе проекты
+            if user_info[username][0]['projects']:
+                if 0 < tag < len(user_info[username][0]['projects']):
+                    del user_info[username][0]['projects'][int(tag)]
+
         else:
             # Изменяю информацию
             user_info[username][0][tag] = info
@@ -163,9 +166,7 @@ class SocialMediaCheck:
 
 # Портфолио и его изменение
 class Portfolio:
-    def __init__(self):
-        pass
-
+    # Добавление предмета в портфолио
     def add_item(self, username, board):
         form_status = False
 
@@ -274,8 +275,9 @@ class Portfolio:
                 for i in range(len(music_list)):
                     board.json_write_data(username, '', music_list[i][:-4], 6)
 
-    def remove_item(self, project):
-        pass
+    # Удаление предмета из портфолио
+    def remove_item(self, username, board, project_id):
+        board.json_write_data(username, '', project_id, 7)
 
 
 # API Портфолио
@@ -501,7 +503,7 @@ def empty_board():
 
 
 # Панель управления
-@app.route('/dashboard/<username>', methods=['POST', 'GET'])
+@app.route('/dashboard/<string:username>', methods=['POST', 'GET'])
 def dashboard(username):
     # Создаю объекты классов содержимого JSON файла,
     # соц. сетей, портфолио
@@ -645,6 +647,56 @@ def dashboard(username):
                                user=username)
 
 
+# Удаление проекта без заданных параметров 1
+@app.route('/delete')
+def delete_project_empty():
+    # Перенаправление на страницу ошибки
+    return redirect(url_for('error404'))
+
+
+# Удаление проекта без заданных параметров 2
+@app.route('/delete/<string:username>')
+def delete_project_empty_user(username):
+    # Перенаправление на страницу ошибки
+    return redirect(url_for('error404'))
+
+
+# Удаление проекта без заданных параметров 3
+@app.route('/delete/<int:project_id>')
+def delete_project_empty_id(project_id):
+    # Перенаправление на страницу ошибки
+    return redirect(url_for('error404'))
+
+
+# Удаление проекта
+@app.route('/delete/<string:username>/<int:project_id>', methods=["POST"])
+def delete_project(username, project_id):
+    # Создаю объекты классов содержимого JSON файла, портфолио
+    board = ChangeJSON()
+    portfolio = Portfolio()
+
+    list_db = check_username(username)
+
+    # Если пользователь найден в базе данных
+    if list_db[1]:
+        # Если пользователь вошел в свою страницу
+        if 'logged_in' in session:
+            # Если пользователь вошел в свою панель управления
+            if session['logged_in'] and \
+                    session['username'] == username:
+                portfolio.remove_item(username, board, project_id)
+                return redirect("/{}".format(session['username']))
+
+            # Если пользователь удаляет файл чужого пользователя
+            else:
+                return redirect("/{}".format(session['username']))
+
+        # Если пользователь не вошел в систему
+        else:
+            # Перенаправление на страницу входа
+            return redirect(url_for('login'))
+
+
 # Сама профильная страница
 @app.route("/<username>")
 def account(username):
@@ -689,4 +741,4 @@ def error404():
 
 # Запуск программы
 if __name__ == '__main__':
-    app.run(port=8080, host='localhost')
+    app.run(port=1025, host='localhost')

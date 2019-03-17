@@ -182,8 +182,10 @@
                                 {% endif %}
                                 </p>
                                 <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#">
-                                    <i class="fa fa-close"></i>
-                                 Close</a>
+                                    <i class="fa fa-close"></i>Close</a>
+                                <form action="{{url_for('delete_project', username = user, project_id = item)}}" method="post">
+                                    <a class="btn btn-primary btn-lg rounded-pill portfolio-modal-dismiss" href="#" onclick="document.forms[0].submit();return false;">Delete</a>
+                                </form>
                             </div>
                 </div>
             </div>
