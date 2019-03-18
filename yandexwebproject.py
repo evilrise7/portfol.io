@@ -137,7 +137,7 @@ class ChangeJSON:
             # Удаление проекта
             # Проверка есть ли в листе проекты
             if user_info[username][0]['projects']:
-                if 0 < tag < len(user_info[username][0]['projects']):
+                if -1 < tag < len(user_info[username][0]['projects']):
                     del user_info[username][0]['projects'][int(tag)]
 
         else:
